@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="IT-Security Trainer">
+  <meta name="description" content="Lokale Browser-App IT-Security-Beauftragte:r v1.2.0.">
+  <title>IT-Security-Beauftragte:r v1.2.0</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --panel-2: #eef3f8;
+      --text: #17202a;
+      --muted: #64748b;
+      --line: #d9e2ec;
+      --brand: #0f766e;
+      --brand-2: #115e59;
+      --accent: #2563eb;
+      --good: #15803d;
+      --bad: #b91c1c;
+      --warn: #b45309;
+      --shadow: 0 18px 50px rgba(15, 23, 42, .08);
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    [data-theme="dark"] {
+      --bg: #111827;
+      --panel: #182231;
+      --panel-2: #223044;
+      --text: #eef2f7;
+      --muted: #aab6c7;
+      --line: #314157;
+      --brand: #2dd4bf;
+      --brand-2: #5eead4;
+      --accent: #60a5fa;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); padding-bottom: env(safe-area-inset-bottom); -webkit-tap-highlight-color: transparent; }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; touch-action: manipulation; min-height: 44px; }
+    .skip-link { position: absolute; left: -999px; top: 8px; background: var(--panel); padding: 10px; z-index: 10; }
+    .skip-link:focus { left: 8px; }
+    .shell { min-height: 100vh; display: grid; grid-template-columns: 280px 1fr; }
+    .sidebar { background: #0f172a; color: #e5eef8; padding: 22px; display: flex; flex-direction: column; gap: 22px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 44px; height: 44px; border-radius: 8px; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 800; }
+    .brand small { color: #9fb0c7; display: block; margin-top: 2px; }
+    nav { display: grid; gap: 8px; }
+    .nav-item { border: 0; background: transparent; color: inherit; text-align: left; padding: 12px; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
+    .nav-item:hover, .nav-item.active { background: rgba(255,255,255,.12); }
+    .local-note { margin-top: auto; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; padding: 12px; color: #bdc9da; font-size: 14px; }
+    .workspace { min-width: 0; }
+    .topbar { padding: 20px 28px; background: var(--panel); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; align-items: center; position: sticky; top: 0; z-index: 5; }
+    .eyebrow { margin: 0 0 3px; color: var(--brand); font-weight: 700; font-size: 13px; text-transform: uppercase; }
+    h1, h2, h3 { margin: 0; letter-spacing: 0; }
+    h1 { font-size: clamp(25px, 3vw, 36px); }
+    h2 { font-size: 22px; }
+    h3 { font-size: 17px; }
+    main { padding: 28px; max-width: 1240px; margin: 0 auto; width: 100%; }
+    .grid { display: grid; gap: 16px; }
+    .cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
+    .pad { padding: 18px; }
+    .section { margin-top: 18px; }
+    .muted { color: var(--muted); }
+    .metric { display: grid; gap: 4px; }
+    .metric strong { font-size: 30px; }
+    .button, .icon-button { border: 1px solid transparent; border-radius: 8px; background: var(--brand); color: #fff; padding: 10px 14px; font-weight: 700; }
+    .button.secondary, .icon-button.secondary { background: var(--panel-2); color: var(--text); border-color: var(--line); }
+    .button.next { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .button.ghost { background: transparent; color: var(--text); border-color: var(--line); }
+    .button.danger { background: var(--bad); color: #fff; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .icon-button { width: 42px; height: 42px; padding: 0; display: grid; place-items: center; }
+    label { display: grid; gap: 6px; color: var(--muted); font-size: 14px; }
+    input, select, textarea { width: 100%; border: 1px solid var(--line); background: var(--panel); color: var(--text); border-radius: 8px; padding: 10px 12px; }
+    textarea { min-height: 78px; resize: vertical; }
+    input[type="checkbox"] { width: auto; }
+    .setting-grid { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)); gap: 12px; }
+    .checkline { display: flex; align-items: center; gap: 8px; color: var(--text); }
+    .question-card { display: grid; gap: 16px; }
+    .question-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill { border-radius: 999px; padding: 5px 9px; background: var(--panel-2); color: var(--muted); font-size: 13px; font-weight: 700; }
+    .pill.good { background: rgba(21,128,61,.13); color: var(--good); }
+    .pill.bad { background: rgba(185,28,28,.13); color: var(--bad); }
+    .pill.warn { background: rgba(180,83,9,.15); color: var(--warn); }
+    .option { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: flex; gap: 10px; align-items: flex-start; background: var(--panel); }
+    .option.correct { border-color: rgba(21,128,61,.5); background: rgba(21,128,61,.08); }
+    .option.wrong { border-color: rgba(185,28,28,.5); background: rgba(185,28,28,.08); }
+    .feedback { border-left: 4px solid var(--brand); background: var(--panel-2); padding: 14px; border-radius: 8px; }
+    .feedback.error { border-color: var(--bad); }
+    .timer { font-variant-numeric: tabular-nums; font-weight: 800; color: var(--brand-2); }
+    .progress { height: 10px; background: var(--panel-2); border-radius: 99px; overflow: hidden; }
+    .progress span { display: block; height: 100%; background: var(--brand); width: 0; }
+    .bar { height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; margin-top: 6px; }
+    .bar span { display: block; height: 100%; background: var(--accent); }
+    .list { display: grid; gap: 10px; }
+    .list-item { border: 1px solid var(--line); border-radius: 8px; padding: 13px; background: var(--panel); }
+    .answer-grid { display: grid; gap: 8px; margin-top: 10px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: 13px; }
+    .menu-button { display: none; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) {
+      body { font-size: 16px; }
+      .option { padding: 14px; }
+      .button { width: 100%; }
+      .button-row { align-items: stretch; }
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { position: fixed; inset: 0 auto 0 0; width: 280px; z-index: 20; transform: translateX(-100%); transition: transform .2s ease; }
+      .sidebar.open { transform: translateX(0); }
+      .menu-button { display: grid; }
+      .topbar, main { padding-left: 16px; padding-right: 16px; }
+      .cols-2, .cols-3, .setting-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+  <a class="skip-link" href="#app">Zum Inhalt springen</a>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="brand-mark">IT</span>
+        <span><strong>IT-Security-Beauftragte:r</strong><small>Version 1.2.0 · lokal</small></span>
+      </div>
+      <nav aria-label="Hauptnavigation">
+        <button class="nav-item active" data-view="dashboard">⌂ Dashboard</button>
+        <button class="nav-item" data-view="practice">✓ Üben</button>
+        <button class="nav-item" data-view="exam">◷ Prüfung</button>
+        <button class="nav-item" data-view="questions">≣ Fragenbank</button>
+        <button class="nav-item" data-view="analysis">↗ Lernanalyse</button>
+        <button class="nav-item" data-view="settings">⚙ Einstellungen</button>
+      </nav>
+      <div class="local-note"><strong>Privat gespeichert</strong><br>Ergebnisse bleiben im Browser auf diesem Gerät.<br><br><strong>PC + Handy:</strong> Lernstand unter Einstellungen exportieren bzw. importieren.</div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <button class="icon-button secondary menu-button" id="menu">☰</button>
+        <div>
+          <p class="eyebrow">IT-Security-Beauftragte:r · v1.2.0</p>
+          <h1 id="title">Dashboard</h1>
+        </div>
+        <div class="button-row">
+          <span class="pill" id="storage">Lokal</span>
+          <button class="icon-button secondary" id="theme" title="Farbschema wechseln">◐</button>
+        </div>
+      </header>
+      <main id="app" tabindex="-1"></main>
+    </div>
+  </div>
+  <script>
+    const DEFAULT_QUESTIONS = [
+      q(1,"Was ist das primäre Ziel von IT-Sicherheit?",["Maximierung der Systemleistung", "Schutz von Informationen vor Missbrauch, Verlust und Manipulation", "Reduzierung von Hardwarekosten", "Vereinfachung von IT-Prozessen"],["B"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 1. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(2,"Welche Aussagen zu den Schutzzielen der IT-Sicherheit sind korrekt?",["Vertraulichkeit schützt vor unbefugtem Zutritt", "Integrität stellt sicher, dass Daten verfügbar sind", "Verfügbarkeit bedeutet, dass Systeme nutzbar sind", "Integrität schützt vor unbemerkter Veränderung"],["C", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 2. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(3,"Ein Mitarbeiter speichert Passwörter offen sichtbar. Welche Risiken entstehen?",["Unbefugter Zugriff", "Stärkung der Integrität", "Verletzung der Vertraulichkeit", "Automatische Abschaltung"],["A", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 3. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(4,"Warum ist IT-Sicherheit heute besonders relevant?",["Höhere Vernetzung von Systemen", "Steigende Anzahl von Cyberangriffen", "Sinkende Abhängigkeit von IT", "Zunehmende Digitalisierung"],["A", "B", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 4. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(5,"Welche Aussage beschreibt IT-Sicherheit korrekt?",["Sie ist ausschließlich technisch", "Sie betrifft nur die IT-Abteilung", "Sie umfasst Technik, Prozesse und Menschen", "Sie ist optional"],["C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 5. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(6,"Welche Aufgaben gehören zum Risikomanagement?",["Identifikation von Risiken", "Bewertung von Risiken", "Entwicklung von Marketingstrategien", "Festlegung von Maßnahmen"],["A", "B", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 6. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(7,"Ein Unternehmen kennt Risiken, reagiert aber chaotisch. Welche Probleme liegen vor?",["Fehlendes Incident Management", "Zu viele Sicherheitsmaßnahmen", "Fehlende Prozesse", "Unzureichende Planung"],["A", "C", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 7. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(8,"Welche Prozesse gehören zu den Kernprozessen der IT-Sicherheit?",["Risikomanagement", "Incident Management", "Notfallmanagement", "Finanzmanagement"],["A", "B", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 8. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(9,"Was ist das Hauptziel des Incident Managements?",["Systeme entwickeln", "Sicherheitsvorfälle erkennen und behandeln", "Benutzerkonten verwalten", "Daten archivieren"],["B"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 9. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(10,"Warum sind Prozesse in der IT-Sicherheit unverzichtbar?",["Klare Abläufe", "Schnelles Handeln im Ernstfall", "Ersatz für Technik", "Reduzierung von Unsicherheit"],["A", "B", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 10. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(11,"Welche Aussagen zu einem ISMS sind korrekt?",["Systematischer Ansatz", "Kombination aus Technik, Prozessen und Organisation", "Nur für IT-Abteilung relevant", "Unterstützung der Risikosteuerung"],["A", "B", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 11. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(12,"Wer trägt die Gesamtverantwortung für IT-Sicherheit?",["IT-Abteilung", "Mitarbeitende", "Geschäftsleitung", "Externe Dienstleister"],["C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 12. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(13,"Was umfasst der Scope eines ISMS?",["Systeme", "Daten", "Prozesse", "Beliebige externe Unternehmen"],["A", "B", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 13. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(14,"Warum ist physische Sicherheit kritisch?",["Umgehung technischer Maßnahmen", "Manipulation von Hardware", "Kopieren von Daten", "Ersatz für IT-Sicherheit"],["A", "B", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 14. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(15,"Was ist eine Maßnahme der physischen Sicherheit?",["Passwortpolicy", "Firewall", "Zutrittskontrolle", "Antivirus"],["C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 15. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(16,"Welche sind physische Gefahren?",["Diebstahl", "Sabotage", "Unbefugter Zutritt", "Softwarefehler"],["A", "B", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 16. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(17,"Welche Aussagen zu Social Engineering sind korrekt?",["Nutzt menschliches Verhalten", "Nur technisch", "Kann vor Ort passieren", "Ziel sind Informationen"],["A", "C", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 17. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(18,"Welche sind Umweltgefahren?",["Feuer", "Wasser", "Stromausfall", "Phishing"],["A", "B", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 18. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(19,"Ein Laptop wird gestohlen. Welche Risiken bestehen?",["Unbefugter Zugriff", "Verlust der Vertraulichkeit", "Höhere Leistung", "Datenschutzverletzung"],["A", "B", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 19. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(20,"Was sind Aufgaben von IAM?",["Identitäten verwalten", "Zugriffe steuern", "Berechtigungen vergeben", "Software entwickeln"],["A", "B", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 20. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(21,"Was ist der Unterschied zwischen Identität und Benutzerkonto?",["Kein Unterschied", "Identität = Person, Konto = technisch", "Konto ist wichtiger", "Identität ist Passwort"],["B"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 21. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(22,"Welche Methoden gehören zur Authentifizierung?",["Passwort", "Fingerabdruck", "Einmalcode", "Benutzerrolle"],["A", "B", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 22. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(23,"Was beschreibt Autorisierung?",["Identitätsprüfung", "Rechtevergabe", "Netzwerkverbindung", "Datenspeicherung"],["B"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 23. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(24,"Welche Aussagen zum Minimalprinzip sind korrekt?",["Nur notwendige Rechte", "Risikoreduktion", "Vollzugriff für alle", "Schadensbegrenzung"],["A", "B", "D"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 24. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(25,"Ein Serverraum ist offen. Welche Maßnahmen sind sinnvoll?",["Zugang sichern", "Vorfall melden", "Zugriff prüfen", "Ignorieren"],["A", "B", "C"],"Kurswoche 1","Quelle: Quiz-1-Kurswoche, Frage 25. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(26,"Warum reicht es nicht aus, nur den Zugriff auf Systeme zu kontrollieren?",["Systeme sind automatisch sicher", "Aktionen nach dem Login sind oft nicht nachvollziehbar", "Benutzer machen keine Fehler", "Zugriff ist unwichtig"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 1. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(27,"Welche Elemente sind notwendig für echte Nachvollziehbarkeit?",["Protokollierung von Aktionen", "Eindeutige Benutzeridentifikation", "Unveränderbare Logs", "Gemeinsame Benutzerkonten"],["A", "B", "C"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 2. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(28,"Eine Datei wurde verändert, aber niemand weiß von wem. Welche Folgen entstehen?",["Ursache bleibt unklar", "Verantwortung ist eindeutig", "Analyse wird erschwert", "Audit wird problematisch"],["A", "C", "D"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 3. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(29,"Welche Aussage beschreibt Sicherheit am besten?",["Zugriff allein reicht", "Zugriff, Nutzung und Nachweis müssen kombiniert werden", "Technik ist ausreichend", "Logging ist optional"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 4. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(30,"Warum entstehen viele Sicherheitsprobleme im Alltag?",["Unachtsamkeit", "Falsche E-Mail-Empfänger", "Nur durch Hackerangriffe", "Fehlende Prozesse"],["A", "B", "D"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 5. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(31,"Was ist das Hauptziel von Data Loss Prevention (DLP)?",["Systeme beschleunigen", "Datenflüsse kontrollieren und Datenverlust verhindern", "Benutzer verwalten", "Hardware schützen"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 6. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(32,"Welche Bereiche umfasst DLP?",["Technik", "Organisation", "Mensch", "Nur Software"],["A", "B", "C"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 7. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(33,"Warum sind Daten besonders kritisch für Unternehmen?",["Sie sind unwichtig", "Sie sind Grundlage für Prozesse und Entscheidungen", "Sie haben keinen Einfluss", "Nur für IT relevant"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 8. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(34,"Ein Laptop mit sensiblen Daten geht verloren. Welche Folgen sind möglich?",["Datenabfluss", "Betriebsunterbrechung", "Vertrauensverlust", "Automatische Wiederherstellung"],["A", "B", "C"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 9. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(35,"Warum wird Datenverlust oft unterschätzt?",["Risiken sind immer sichtbar", "Alltag wirkt harmlos", "Es gibt ständig Warnungen", "Systeme verhindern alles"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 10. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(36,"Was beschreibt ein Bedrohungsszenario?",["Eine Entwicklung", "Ein einzelner Angriff", "Eine mögliche Gefahr", "Noch kein Schaden"],["A", "C", "D"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 11. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(37,"Wann beginnt ein Sicherheitsproblem typischerweise?",["Erst beim Angriff", "Bei den Voraussetzungen und Schwachstellen", "Nach dem Schaden", "Beim Audit"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 12. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(38,"Was beschreibt eine Schwachstelle?",["Eine Lücke", "Ein Angriff", "Technische Schwäche", "Immer ein Risiko"],["A", "C"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 13. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(39,"Wann wird aus einer Schwachstelle ein Risiko?",["Immer automatisch", "Durch Bewertung von Wahrscheinlichkeit und Schaden", "Erst nach einem Angriff", "Nie"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 14. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(40,"Warum erhöhen IoT und Industrie 4.0 Risiken?",["Mehr Vernetzung", "Höhere Komplexität", "Mehr Angriffsflächen", "Weniger Systeme"],["A", "B", "C"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 15. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(41,"Was ist typisch für moderne IT-Risiken?",["Sofort sichtbar", "Entwickeln sich schrittweise", "Betreffen nur ein System", "Einfach zu erkennen"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 16. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(42,"Warum ist Netzwerksicherheit zentral?",["Daten bewegen sich im Netzwerk", "Verbindungen sind Angriffspunkte", "Kommunikation ist unwichtig", "Grundlage für DLP"],["A", "B", "D"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 17. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(43,"Was ist schwieriger zu kontrollieren?",["Einzelnes System", "Kommunikation zwischen Systemen", "Beides gleich einfach", "Keine Kontrolle notwendig"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 18. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(44,"Was sind typische Angriffsflächen?",["Geräte", "Verbindungen", "Datenflüsse", "Nur Server"],["A", "B", "C"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 19. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(45,"Warum sind veraltete Systeme gefährlich?",["Sie sind immer sicher", "Sie enthalten oft bekannte Schwachstellen", "Sie verbessern Sicherheit", "Sie werden automatisch geschützt"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 20. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(46,"Was ist Ziel von Netzwerksicherheit?",["Verbindungen kontrollieren", "Datenflüsse überwachen", "Kommunikation verstehen", "Nur Systeme schützen"],["A", "B", "C"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 21. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(47,"Was passiert, wenn Risiken bekannt sind, aber keine Maßnahmen umgesetzt werden?",["Risiko verschwindet", "Risiken bleiben bestehen", "Sicherheit steigt automatisch", "Probleme lösen sich selbst"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 22. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(48,"Was sind typische Maßnahmen?",["Richtlinien", "Technische Kontrollen", "Schulungen", "Ignorieren von Risiken"],["A", "B", "C"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 23. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(49,"Warum reicht Technik allein nicht aus?",["Mensch spielt keine Rolle", "Verhalten und Prozesse sind entscheidend", "Technik löst alles", "Organisation ist irrelevant"],["B"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 24. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(50,"Ein Unternehmen hat Technik, aber keine Prozesse. Welche Probleme entstehen?",["Umsetzung fehlt", "Risiken bleiben", "Sicherheit ist vollständig", "Maßnahmen greifen nicht"],["A", "B", "D"],"Kurswoche 2","Quelle: Quiz-2-Kurswoche, Frage 25. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(51,"Was beschreibt Logging im Kontext der IT-Sicherheit am besten?",["Zugriff auf Systeme ermöglichen", "Aktionen im System nachvollziehbar machen", "Daten automatisch löschen", "Benutzerkonten verwalten"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 1. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(52,"Welche Eigenschaften müssen Protokolle erfüllen, um auditfähig zu sein?",["Veränderbar sein", "Vollständig sein", "Unveränderbar sein", "Zeitlich zuordenbar sein"],["B", "C", "D"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 2. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(53,"Warum ist Archivierung für IT-Sicherheit notwendig?",["Um Speicherplatz zu sparen", "Um langfristige Nachweise zu ermöglichen", "Um Systeme schneller zu machen", "Um Benutzer zu verwalten"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 3. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(54,"Welche Probleme entstehen ohne Nachvollziehbarkeit?",["Verantwortlichkeiten sind klar", "Ursachen bleiben unklar", "Audits werden erschwert", "Vertrauen sinkt"],["B", "C", "D"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 4. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(55,"Was ist der Unterschied zwischen Backup und Archivierung?",["Es gibt keinen Unterschied", "Backup dient Wiederherstellung, Archivierung dem Nachweis", "Archivierung ersetzt Backup vollständig", "Backup ist langfristiger als Archivierung"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 5. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(56,"Welche typischen Fehler passieren bei der Archivierung?",["Logs werden vollständig gespeichert", "Logs sind veränderbar", "Daten werden zu früh gelöscht", "Keine zentrale Speicherung"],["B", "C", "D"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 6. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(57,"Warum reicht IAM allein nicht aus?",["IAM ist zu teuer", "Aktionen nach dem Zugriff bleiben sonst unkontrolliert", "IAM verhindert alle Angriffe", "IAM ist technisch nicht möglich"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 7. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(58,"Welche Risiken bestehen bei Servicekonten?",["Sie werden häufig kontrolliert", "Sie haben oft hohe Rechte", "Sie laufen im Hintergrund", "Sie sind immer sichtbar"],["B", "C"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 8. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(59,"Was beschreibt eine Identität korrekt?",["Ein Benutzerkonto", "Eine reale Person oder ein System", "Ein Passwort", "Eine Rolle im System"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 9. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(60,"Welche Fehler passieren häufig bei der Rechtevergabe?",["Rechte werden geprüft", "Rechte werden schnell vergeben", "Alte Rechte bleiben bestehen", "Regelmäßige Kontrolle fehlt"],["B", "C", "D"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 10. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(61,"Warum ist Trennung von Aufgaben wichtig?",["Um Prozesse zu verlangsamen", "Um Missbrauch und Fehler zu reduzieren", "Um Kosten zu erhöhen", "Um Verantwortung zu vermeiden"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 11. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(62,"Welche Phasen gehören zum Benutzer-Lifecycle?",["Onboarding", "Rollenänderung", "Wartung", "Rezertifizierung"],["A", "B", "D"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 12. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(63,"Was ist das größte Risiko beim Offboarding?",["Zu viele neue Benutzer", "Aktive Zugänge ehemaliger Mitarbeitender", "Zu wenig Speicherplatz", "Fehlende Updates"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 13. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(64,"Welche Folgen hat Datenverlust?",["Betriebsunterbrechung", "Vertrauensverlust", "Imagegewinn", "Finanzielle Schäden"],["A", "B", "D"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 14. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(65,"Was beschreibt Data Leakage?",["Daten werden gelöscht", "Daten verlassen das Unternehmen unkontrolliert", "Daten werden verschlüsselt", "Daten werden archiviert"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 15. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(66,"Welche Ursachen führen zu Sicherheitsproblemen?",["Menschliche Fehler", "Technische Schwachstellen", "Fehlende Prozesse", "Perfekte Dokumentation"],["A", "B", "C"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 16. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(67,"Warum ist Awareness wichtig?",["Technik ersetzt Menschen", "Menschen sind häufig die Schwachstelle", "Systeme arbeiten ohne Benutzer", "Awareness verhindert Technikprobleme"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 17. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(68,"Welche Risiken bestehen im Datenlebenszyklus?",["Erstellung", "Nutzung", "Weitergabe", "Nur bei Speicherung"],["A", "B", "C"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 18. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(69,"Was ist ein Bedrohungsszenario?",["Ein eingetretener Schaden", "Eine mögliche zukünftige Gefahr", "Ein abgeschlossener Angriff", "Eine Sicherheitsmaßnahme"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 19. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(70,"Welche Faktoren erhöhen die Angriffsfläche?",["Mehr Systeme", "Mehr Schnittstellen", "Höhere Komplexität", "Weniger Vernetzung"],["A", "B", "C"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 20. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(71,"Was beschreibt „Laterale Bewegung“?",["Zugriff auf ein System verhindern", "Ausbreitung eines Angreifers im Netzwerk", "Backup erstellen", "Daten verschlüsseln"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 21. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(72,"Welche typischen Angriffstypen gibt es?",["Phishing", "Malware", "Passwortangriffe", "Updates"],["A", "B", "C"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 22. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(73,"Was ist das Ziel von Netzwerksicherheit?",["Systeme abschalten", "Verbindungen kontrollieren und überwachen", "Benutzer ersetzen", "Daten löschen"],["B"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 23. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(74,"Welche Maßnahmen gehören zu Network Security?",["Firewall", "Monitoring", "Segmentierung", "Ignorieren von Risiken"],["A", "B", "C"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 24. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(75,"Was bedeutet das Zero-Trust-Prinzip?",["Allen Benutzern vertrauen", "Zugriff ohne Prüfung erlauben", "Jeden Zugriff überprüfen und minimieren", "Keine Kontrolle durchführen"],["C"],"Kurswoche 2 Teil 2","Quelle: Quiz-2-Kurswoche-Teil2, Frage 25. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(76,"Was verändert sich grundlegend bei der Nutzung von Cloud-Systemen?",["Systeme sind besser sichtbar", "Kontrolle verlagert sich auf Identitäten und Berechtigungen", "Netzwerk wird wichtiger", "Verantwortung entfällt"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 1. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(77,"Warum ist „Identity ist die neue Firewall“ eine wichtige Aussage?",["Zugriff basiert auf Benutzer", "Netzwerk verliert an Bedeutung", "Geräte sind vollständig kontrollierbar", "Kontext (Ort, Zeit) wird relevant"],["A", "B", "D"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 2. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(78,"Was ist das häufigste Risiko in Cloud-Umgebungen?",["Hochkomplexe Hackerangriffe", "Fehlkonfigurationen", "Hardwaredefekte", "Netzwerküberlastung"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 3. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(79,"Welche sind typische Cloud-Fehler?",["Offene Freigaben", "Zu viele Berechtigungen", "Klare Zuständigkeiten", "Temporäre Rechte bleiben bestehen"],["A", "B", "D"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 4. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(80,"Wer ist in der Cloud für Benutzer und Rechte verantwortlich?",["Cloud-Anbieter", "Unternehmen selbst", "Niemand", "Nur externe Partner"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 5. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(81,"Warum ist eine IST-Analyse notwendig?",["Überblick über Systeme", "Kontrolle über Benutzer", "Entscheidungen auf Basis realer Daten", "Ersatz für Maßnahmen"],["A", "B", "C"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 6. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(82,"Was ist das größte Problem ohne vollständige Systemübersicht?",["Höhere Performance", "Unbekannte Systeme werden nicht geschützt", "Mehr Kontrolle", "Schnellere Prozesse"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 7. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(83,"Welche Benutzer stellen besondere Risiken dar?",["Aktive Mitarbeiter", "Alte Accounts", "Servicekonten", "Unbekannte Nutzer"],["B", "C", "D"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 8. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(84,"Warum sind zu viele Berechtigungen problematisch?",["Sie erhöhen die Sicherheit", "Sie schaffen unnötige Angriffsflächen", "Sie vereinfachen Prozesse", "Sie reduzieren Risiken"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 9. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(85,"Wie entsteht Überberechtigung?",["Rollenwechsel", "Alte Rechte bleiben bestehen", "Neue Rechte kommen hinzu", "Regelmäßige Bereinigung"],["A", "B", "C"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 10. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(86,"Was ist ein Asset?",["Nur Hardware", "Alles mit Wert für das Unternehmen", "Nur Daten", "Nur Software"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 11. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(87,"Warum sind Daten besonders kritische Assets?",["Grundlage für Entscheidungen", "Wettbewerbsvorteil", "Leicht ersetzbar", "Hoher Schaden bei Verlust"],["A", "B", "D"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 12. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(88,"Warum reicht eine einzelne Sicherheitsmaßnahme nicht aus?",["Sie ist zu teuer", "Sie wirkt isoliert ohne Konzept", "Sie ist unnötig", "Sie ersetzt Prozesse"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 13. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(89,"Was gehört zu einem Sicherheitskonzept?",["Struktur", "Verantwortlichkeiten", "Einzelmaßnahmen", "Zufällige Umsetzung"],["A", "B", "C"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 14. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(90,"Was ist das Ziel von ISO 27001?",["Software bereitstellen", "Sicherheit systematisch organisieren", "Netzwerke bauen", "Hardware schützen"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 15. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(91,"Warum sind Standards wichtig?",["Nachweisbarkeit", "Vertrauen", "Vergleichbarkeit", "Ersatz für Maßnahmen"],["A", "B", "C"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 16. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(92,"Warum kann ein Audit trotz guter Technik scheitern?",["Zu viele Systeme", "Fehlende Dokumentation", "Zu viel Sicherheit", "Zu wenig Benutzer"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 17. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(93,"Was gehört zu einem ISMS?",["Prozesse", "Verantwortlichkeiten", "Dokumentation", "Einzelmaßnahmen"],["A", "B", "C"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 18. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(94,"Was beschreibt der PDCA-Zyklus?",["Ein einmaliger Prozess", "Einen kontinuierlichen Verbesserungsprozess", "Nur Planung", "Nur Kontrolle"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 19. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(95,"Warum ist Notfallmanagement wichtig?",["IT-Ausfälle sind irrelevant", "Unternehmen sind abhängig von IT", "Ausfälle führen zu Stillstand", "Nur große Unternehmen betroffen"],["B", "C"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 20. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(96,"Was ist ein Notfall?",["Kleine Störung", "Kritische Situation, die normale Abläufe überfordert", "Geplantes Ereignis", "Unwichtiges Problem"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 21. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(97,"Welche sind typische Notfälle?",["Serverausfall", "Cyberangriff", "Stromausfall", "Kleine Fehler"],["A", "B", "C"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 22. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(98,"Was ist das Ziel von Notfallmanagement?",["Notfälle verhindern", "Schäden begrenzen und Betrieb wiederherstellen", "Systeme abschalten", "Risiken ignorieren"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 23. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(99,"Warum ist Awareness wichtig?",["Mensch ist Risikofaktor", "Verhalten beeinflusst Sicherheit", "Technik reicht aus", "Angriffe zielen auf Menschen"],["A", "B", "D"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 24. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(100,"Was ist das Ziel von Awareness?",["Wissen allein", "Sicheres Verhalten im Alltag", "Technik ersetzen", "Prozesse vermeiden"],["B"],"Kurswoche 3","Quelle: Quiz-3-Kurswoche, Frage 25. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(101,"Was ist der erste Schritt beim Aufbau eines ISMS in der Praxis?",["Maßnahmen umsetzen", "Scope definieren", "Audit durchführen", "Systeme abschalten"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 1. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(102,"Welche Schritte gehören zum Aufbau eines ISMS?",["Systeme erfassen", "Risiken analysieren", "Benutzer löschen", "Maßnahmen festlegen"],["A", "B", "D"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 2. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(103,"Was ist das Ziel der PLAN-Phase im PDCA-Zyklus?",["Umsetzung von Maßnahmen", "Festlegung von Zielen und Strukturen", "Kontrolle von Maßnahmen", "Verbesserung bestehender Prozesse"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 3. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(104,"Welche Faktoren gehören zum Kontext der Organisation?",["Interne Einflussfaktoren", "Externe Einflussfaktoren", "Nur technische Systeme", "Rechtliche Anforderungen"],["A", "B", "D"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 4. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(105,"Was beschreibt der Scope im ISMS?",["Anzahl der Mitarbeitenden", "Geltungsbereich der Informationssicherheit", "Budgetplanung", "Softwareliste"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 5. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(106,"Welche Aussagen zur Sicherheitsleitlinie sind korrekt?",["Definiert Sicherheitsziele", "Gibt strategische Richtung vor", "Enthält nur technische Details", "Ist Grundlage für Maßnahmen"],["A", "B", "D"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 6. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(107,"Wer trägt die Hauptverantwortung für das ISMS?",["IT-Abteilung", "Geschäftsführung", "Mitarbeitende", "Externe Dienstleister"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 7. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(108,"Welche Schritte gehören zum Risikomanagement?",["Risiken identifizieren", "Risiken bewerten", "Risiken ignorieren", "Risiken priorisieren"],["A", "B", "D"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 8. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(109,"Was passiert in der DO-Phase?",["Planung", "Umsetzung von Maßnahmen", "Kontrolle", "Dokumentation"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 9. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(110,"Was gehört zur CHECK-Phase?",["Überprüfung der Maßnahmen", "Durchführung von Audits", "Umsetzung von Maßnahmen", "Erkennen von Schwachstellen"],["A", "B", "D"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 10. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(111,"Was ist das Ziel der ACT-Phase?",["Systeme abschalten", "Kontinuierliche Verbesserung", "Daten löschen", "Benutzer anlegen"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 11. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(112,"Welche Ziele verfolgt Notfallmanagement?",["Schäden minimieren", "Prozesse schnell wiederherstellen", "Systeme dauerhaft abschalten", "Handlungsfähigkeit sichern"],["A", "B", "D"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 12. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(113,"Wann spricht man von einem Notfall?",["Bei jeder kleinen Störung", "Wenn normale Abläufe nicht mehr ausreichen", "Bei geplanten Wartungen", "Bei Software-Updates"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 13. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(114,"Welche Beispiele sind typische Notfälle?",["Serverausfall", "Cyberangriff", "Stromausfall", "Normale E-Mail"],["A", "B", "C"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 14. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(115,"Was ist das Hauptziel von BCM (Business Continuity Management)?",["Systeme abschalten", "Geschäftsbetrieb aufrechterhalten", "Daten löschen", "Kosten reduzieren"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 15. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(116,"Was zeichnet kritische Prozesse aus?",["Wichtig für das Unternehmen", "Können ignoriert werden", "Müssen priorisiert werden", "Haben keine Auswirkungen"],["A", "C"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 16. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(117,"Was beschreibt RTO?",["Maximale Datenmenge", "Maximale Ausfallzeit", "Benutzeranzahl", "Systemleistung"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 17. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(118,"Welche Maßnahmen gehören zu Notfallstrategien?",["Backups", "Redundanz", "Cloud-Lösungen", "Ignorieren von Risiken"],["A", "B", "C"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 18. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(119,"Was ist der erste Schritt im Notfall?",["Maßnahmen starten", "Notfall erkennen", "Kommunikation", "Wiederherstellung"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 19. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(120,"Welche Schritte gehören zur Notfallbewältigung?",["Alarm auslösen", "Verantwortliche informieren", "Maßnahmen starten", "Ignorieren"],["A", "B", "C"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 20. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(121,"Warum sind klare Rollen im Notfall wichtig?",["Für mehr Chaos", "Für schnelle Entscheidungen", "Für längere Prozesse", "Für weniger Verantwortung"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 21. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(122,"Welche typischen Fehler gibt es im Notfallmanagement?",["Fehlende Dokumentation", "Unklare Rollen", "Regelmäßige Tests", "Keine Übungen"],["A", "B", "D"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 22. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(123,"Warum sind Übungen wichtig?",["Sie kosten Zeit", "Sie zeigen Schwachstellen", "Sie sind unnötig", "Sie ersetzen Planung"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 23. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(124,"Was gehört zu Awareness?",["Risiken erkennen", "Bewusst handeln", "Regeln ignorieren", "Schulungen"],["A", "B", "D"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 24. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(125,"Warum ist Awareness ein Prozess?",["Weil sie einmalig ist", "Weil sie kontinuierlich verbessert wird", "Weil sie nur Technik betrifft", "Weil sie keine Wirkung hat"],["B"],"Kurswoche 3 Teil 2","Quelle: Quiz-3-Kurswoche-Teil2, Frage 25. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(126,"Welche Zielsetzungen spielen im Rahmen eines Informationssicherheitskonzepts eine zentrale Rolle?",["Menschen vor körperlichen und psychischen Beeinträchtigungen schützen", "Gesetzliche sowie regulatorische Anforderungen berücksichtigen", "Wichtige und schwer ersetzbare Informationswerte absichern", "Sämtliche Unternehmensprozesse müssen identisch abgesichert werden"],["A", "B", "C"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 1. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(127,"Welche Maßnahmen unterstützen das Prinzip „Least Privilege“?",["Vergabe minimal notwendiger Rechte", "Regelmäßige Überprüfung von Berechtigungen", "Automatische Administratorrechte für neue Benutzer", "Rollenbasierte Zugriffskonzepte"],["A", "B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 2. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(128,"ISO 27001 Welche Ziele verfolgt ein Informationssicherheitsmanagementsystem (ISMS)?",["Schutz von Informationen und Prozessen", "Sicherstellung strukturierter Sicherheitsprozesse", "Vollständige Abschaffung von Risiken", "Unterstützung kontinuierlicher Verbesserung"],["A", "B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 7. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(129,"Welche Faktoren beeinflussen den Schutzbedarf von Informationen?",["Gesetzliche Anforderungen", "Auswirkungen eines Datenverlustes", "Persönliche Vorlieben einzelner Mitarbeitender", "Bedeutung für Geschäftsprozesse"],["A", "B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 15. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(130,"Was beschreibt das Schutzziel „Integrität“ am besten?",["Informationen stehen jederzeit zur Verfügung", "Informationen bleiben unverändert und korrekt", "Daten dürfen nur verschlüsselt gespeichert werden", "Systeme sind besonders leistungsfähig"],["B"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 16. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(131,"Arbeitsplatz und in ihrem Arbeitsumfeld Warum stellen gemeinsame Benutzerkonten ein Sicherheitsproblem dar?",["Aktionen sind schwer nachvollziehbar", "Verantwortlichkeiten verschwimmen", "Sie erhöhen automatisch die Verfügbarkeit", "Missbrauch kann schlechter erkannt werden"],["A", "B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 21. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(132,"Welche Aufgaben gehören typischerweise zum Schwachstellenmanagement?",["Erkennen technischer Schwächen", "Bewertung von Risiken", "Behebung identifizierter Schwachstellen", "Entwicklung von Marketingkampagnen"],["A", "B", "C"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 22. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(133,"Die „CloudNova Solutions GmbH“, ein junges Unternehmen im Bereich KI- gestützter Unternehmenssoftware, plant die Einführung eines Informationssicherheitsmanagementsystems (ISMS) nach ISO/IEC 27001. Innerhalb der Geschäftsführung wird diskutiert, wie viele personelle und finanzielle Ressourcen langfristig für die Informationssicherheit eingeplant werden müssen. Einige Verantwortliche sehen Informationssicherheit lediglich als einmaliges Projekt, andere als dauerhaften Managementprozess. Für welche Zwecke sollten gemäß ISO/IEC 27001 geeignete Ressourcen bereitgestellt werden?",["Für die dauerhafte Weiterentwicklung und Optimierung des ISMS", "Für die Einführung und Umsetzung eines ISMS", "Für den laufenden Betrieb und die Aufrechterhaltung des ISMS", "Ausschließlich zur Erstellung von Auditberichten für externe Prüfer"],["A", "B", "C"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 23. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(134,"Warum sind regelmäßige Audits wichtig?",["Überprüfung der Wirksamkeit von Maßnahmen", "Erkennen von Abweichungen", "Ersatz für Sicherheitsmaßnahmen", "Unterstützung kontinuierlicher Verbesserung"],["A", "B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 29. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(135,"Welche Aussagen zu Sicherheitsrichtlinien sind korrekt?",["Sie definieren verbindliche Vorgaben", "Sie schaffen Orientierung für Mitarbeitende", "Sie ersetzen technische Schutzmaßnahmen vollständig", "Sie unterstützen einheitliche Prozesse"],["A", "B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 30. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(136,"Die „HealthCloud Systems AG“ entwickelt digitale Lösungen für Arztpraxen und Krankenhäuser. Um flexibler auf steigende Anforderungen reagieren zu können, sollen verschiedene IT-Dienste zukünftig über externe Cloud-Anbieter betrieben werden. Im Rahmen der Sicherheitsbewertung orientiert sich das Unternehmen am BSI IT-Grundschutz, insbesondere am Baustein zur sicheren Nutzung von Cloud-Diensten. Welche Arten von Cloud-Servicemodellen stehen dabei typischerweise im Mittelpunkt der Betrachtung?",["Klassische Desktop-Anwendungen ohne externe Bereitstellung", "Software as a Service (SaaS)", "internes Rechenzentrum", "Infrastructure as a Service (IaaS)"],["B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 31. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(137,"Welche der folgenden Kürzel stehen im BSI IT-Grundschutz-Kompendium für Systembausteine?",["DAT", "SYS", "ROS", "INF"],["B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 34. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(138,"Dienstleister sind Zuständigkeiten klar zu berücksichtigen** Welche Maßnahmen tragen typischerweise dazu bei, das Schutzziel Verfügbarkeit in der Informationssicherheit zu gewährleisten?",["Redundante Systeme und Komponenten einsetzen", "Endpoint Security mit integrierter Firewall", "Datensicherungen und Wiederherstellungsmöglichkeiten vorhalten", "Sicherheitsvorfälle ausschließlich manuell und ohne Automatisierung bearbeiten"],["A", "C"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 40. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(139,"Was beschreibt eine Bedrohung im Kontext der Informationssicherheit?",["Eine mögliche Ursache für Schäden", "Eine technische Sicherheitsmaßnahme", "Eine potenzielle Gefährdung von Informationen", "Ein abgeschlossener Sicherheitsvorfall"],["A", "C"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 41. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(140,"Welche Vorteile bietet eine Netzwerksegmentierung?",["Begrenzung von Angriffsausbreitung", "Trennung kritischer Systeme", "Vollständige Vermeidung aller Cyberangriffe", "Verbesserte Kontrolle von Datenflüssen"],["A", "B", "D"],"Ergänzungsfragen","Quelle: Quizfragenergänzung, Frage 42. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(141,"Welche Normen definieren Anforderungen an Organisationen, die Informationssicherheits-Managementsysteme nach ISO 27001 prüfen und zertifizieren?",["ISO 17021", "ISO 22301", "ISO 27006", "ISO 27003"],["A", "C"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 1. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(142,"Was ist ein typisches Ziel von Business Continuity Management (BCM)?",["Aufrechterhaltung kritischer Geschäftsprozesse", "Schnelle Wiederaufnahme wichtiger Abläufe", "Dauerhafte Abschaltung kritischer Systeme", "Reduzierung betrieblicher Ausfallzeiten"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 2. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(143,"Die „SecureData Systems GmbH“ verarbeitet vertrauliche Informationen aus den Bereichen Gesundheitswesen, Forschung und Finanzdienstleistungen. Um ein angemessenes Niveau der Informationssicherheit zu etablieren, plant das Unternehmen die Einführung eines Sicherheitskonzepts auf Grundlage des BSI IT-Grundschutzes. Im Rahmen der Planung informiert sich die Geschäftsführung über die unterschiedlichen vorgesehenen Absicherungsstufen des BSI.Welche Absicherungsarten gehören zu den vom BSI IT-Grundschutz vorgesehenen Sicherheitsniveaus?",["Erweiterte Hochsicherheits-Absicherung", "Basis-Absicherung", "Kern-Absicherung", "Standard-Absicherung"],["B", "C", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 3. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(144,"Welche Aussagen zu Risikobewertungen sind korrekt?",["Eintrittswahrscheinlichkeit wird betrachtet", "Mögliche Schadenshöhe wird bewertet", "Risiken können vollständig ignoriert werden", "Ergebnisse dienen der Priorisierung von Maßnahmen"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 4. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(145,"Welche Rollen und Funktionen werden vom BSI IT-Grundschutz typischerweise für die Organisation der Informationssicherheit empfohlen?",["Datenschutzbeauftragte:r", "IT-Projektleiter:in", "IT-Sicherheitsbeauftragte:r", "ICS-Informationssicherheitsbeauftragte:r"],["A", "C", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 5. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(146,"Welche Risiken entstehen durch fehlende Patch-Management-Prozesse?",["Bekannte Schwachstellen bleiben offen", "Angriffsflächen vergrößern sich", "Systeme werden automatisch sicherer", "Sicherheitsupdates werden verzögert"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 6. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(147,"Bereiche und Informationen Welche Aussagen zu Cloud-Sicherheit sind korrekt?",["Verantwortlichkeiten müssen klar geregelt sein", "Fehlkonfigurationen stellen ein hohes Risiko dar", "Cloud-Anbieter übernehmen automatisch sämtliche Sicherheitsaufgaben", "Zugriffsrechte bleiben zentral wichtig"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 11. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(148,"Was ist das Ziel einer Schutzbedarfsfeststellung?",["Bewertung der Bedeutung von Informationen und Systemen", "Ermittlung notwendiger Sicherheitsmaßnahmen", "Ersatz technischer Schutzmaßnahmen", "Grundlage für Risikobewertungen"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 12. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(149,"Welche Maßnahmen unterstützen die Verfügbarkeit von Systemen?",["Redundanz", "Backup-Konzepte", "Single Point of Failure", "Notfallplanung"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 15. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(150,"Welche Aspekte gehören typischerweise zur physischen Sicherheit?",["Zutrittskontrollen", "Schutz vor Brandgefahren", "Netzwerkverschlüsselung", "Videoüberwachung"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 18. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(151,"Warum sind regelmäßige Backups wichtig?",["Wiederherstellung nach Ausfällen", "Unterstützung des Notfallmanagements", "Schutz vor Datenverlust", "Vollständige Vermeidung von Cyberangriffen"],["A", "B", "C"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 19. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(152,"Welche Dokumentarten zählen typischerweise zur sogenannten Richtlinien- Pyramide im Informationssicherheitsmanagement?",["Informationssicherheitspolitik", "Schulungsnachweise", "Richtlinien", "Wartungsprotokolle"],["A", "C"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 20. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(153,"Welche Informationen und Unterlagen sollten im Rahmen einer Managementbewertung nach ISO/IEC 27001 berücksichtigt werden?",["Ergebnisse bereits durchgeführter interner Audits", "Frühere Managementbewertungen und deren Ergebnisse", "Marketing- und Vertriebsstrategien des Unternehmens", "Relevante interne sowie externe Veränderungen mit Einfluss auf das ISMS"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 21. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(154,"Welche Probleme entstehen durch fehlende Dokumentation?",["Wiederherstellung nach Ausfällen", "Unterstützung des Notfallmanagements", "Schutz vor Datenverlust", "Vollständige Vermeidung von Cyberangriffen"],["A", "B", "C"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 22. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(155,"Was beschreibt der Begriff „Data Loss“ im Kontext der Informationssicherheit?",["Bewusste oder unbeabsichtigte Löschung bzw. Verlust von Daten", "Beeinträchtigung der Datenintegrität", "Einschränkung oder Verlust der Verfügbarkeit von Informationen", "Automatische Verschlüsselung sensibler Daten durch Sicherheitssysteme"],["A", "B", "C"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 23. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(156,"Welche Aussagen zum Social Engineering treffen zu?",["Angriffe nutzen menschliches Verhalten aus", "Ziel ist häufig Informationsgewinnung", "Ausschließlich technische Systeme sind betroffen", "Täuschung spielt häufig eine zentrale Rolle"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 33. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(157,"Was beschreibt das Prinzip der „Defense in Depth“?",["Kombination mehrerer Schutzmaßnahmen", "Aufbau mehrerer Sicherheitsebenen", "Verzicht auf organisatorische Maßnahmen", "Erhöhung der Widerstandsfähigkeit gegen Angriffe"],["A", "B", "D"],"Ergänzungsfragen 2","Quelle: Quizfragenergänzung2, Frage 34. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(158,"Welche Maßnahmen eignen sich typischerweise, um die Integrität von Informationen sicherzustellen?",["Zugriffskontrollen auf Basis von Rollenmodellen", "Spiegelung kritischer Systeme zur Ausfallsicherheit", "Kryptografische Prüfsummen und Hashverfahren", "Automatische Skalierung von Cloud-Ressourcen"],["C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 8. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(159,"Welche Aufgaben gehören zum Incident Management?",["Erkennung von Sicherheitsvorfällen", "Koordination von Reaktionen", "Analyse von Ursachen", "Entwicklung von Werbestrategien"],["A", "B", "C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 9. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(160,"Verantwortungsbereichen passend bereitgestellt werden Welche Ziele verfolgen Sicherheitskennzahlen (KPIs)?",["Messbarkeit von Sicherheitsmaßnahmen", "Unterstützung von Entscheidungen", "Bewertung von Entwicklungen", "Ersatz von Audits"],["A", "B", "C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 17. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(161,"Welche Maßnahmen eignen sich, um Systeme auf mögliche unautorisierte Zugriffe oder Manipulationen zu überprüfen?",["Analyse sicherheitsrelevanter Protokolle und Logdateien", "Durchführung allgemeiner Zutrittskontrollen für Besucher", "Vergleich von System- und Registry-Daten mit definierten Referenzwerten", "Überwachung sicherheitskritischer Bereiche durch Videoaufzeichnungen"],["A", "C", "D"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 18. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(162,"Was gehört typischerweise zu einem Notfallplan?",["Wiederanlaufmaßnahmen", "Kommunikationswege", "Zuständigkeiten", "Zufällige Maßnahmen ohne Struktur"],["A", "B", "C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 19. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(163,"Welche Voraussetzungen müssen typischerweise erfüllt sein, damit eine Organisation eine ISO-27001-Zertifizierung auf Basis von IT-Grundschutz erfolgreich erreichen kann?",["Erfolgreiche Einleitung und Vorbereitung des Zertifizierungsverfahrens", "Umsetzung einer Sicherheitskonzeption nach Standard-Absicherung", "Umsetzung einer Sicherheitskonzeption nach Kern-Absicherung", "Umsetzung einer ausschließlichen Basis-Absicherung ohne weiterführende"],["A", "B", "C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 20. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(164,"Verbesserung miteinander verbindet Welche Aussagen zu Compliance sind korrekt?",["Gesetzliche Anforderungen müssen berücksichtigt werden", "Interne Vorgaben spielen eine Rolle", "Compliance betrifft nur die IT-Abteilung", "Verstöße können rechtliche Folgen haben"],["A", "B", "D"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 25. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(165,"Welche Vorteile bietet ein rollenbasiertes Berechtigungskonzept?",["Einheitliche Rechtevergabe", "Bessere Kontrolle von Berechtigungen", "Vereinfachte Verwaltung", "Vollständige Vermeidung von Fehlkonfigurationen"],["A", "B", "C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 28. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(166,"Was versteht man im Bereich der Informationssicherheit unter „Data Leakage“?",["Verletzung der Vertraulichkeit sensibler Daten", "Einschränkung oder Verlust der Systemverfügbarkeit", "Unkontrollierter oder unbeabsichtigter Abfluss vertraulicher Informationen", "Unbemerkte Veränderung von Datenbeständen"],["A", "C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 29. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(167,"Welche Aussagen zu Sicherheitsvorfällen treffen zu?",["Schnelle Reaktion reduziert mögliche Schäden", "Dokumentation unterstützt die Nachbearbeitung", "Sicherheitsvorfälle müssen grundsätzlich geheim gehalten werden", "Ursachenanalysen helfen zukünftige Vorfälle zu vermeiden"],["A", "B", "D"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 30. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(168,"Die „LogiSecure Services GmbH“ plant die Einführung eines Informationssicherheitsmanagementsystems (ISMS) nach BSI IT-Grundschutz. Im Rahmen der Vorbereitung soll eine Informationssicherheitsleitlinie erstellt werden, die als strategische Grundlage für die Informationssicherheit im Unternehmen dient und durch die Geschäftsleitung verabschiedet wird. Welche Inhalte sollte eine Informationssicherheitsleitlinie nach den Empfehlungen des BSI IT-Grundschutzes typischerweise enthalten?",["Detaillierte technische Konfigurationsvorgaben einzelner Sicherheitskomponenten", "Definition des Geltungsbereichs der Informationssicherheit", "Übergeordnete Sicherheitsziele der Organisation", "Grundsätzliche strategische Ausrichtung der Informationssicherheit"],["B", "C", "D"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 33. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(169,"Warum ist kontinuierliche Verbesserung im ISMS wichtig?",["Bedrohungen verändern sich ständig", "Prozesse können optimiert werden", "Sicherheitsmaßnahmen müssen regelmäßig überprüft werden", "Ein ISMS bleibt nach der Einführung automatisch dauerhaft wirksam"],["A", "B", "C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 34. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte."),
+      q(170,"Zusammenarbeit Die „CloudSecure Logistics AG“ nutzt verschiedene Cloud-Dienste für internationale Lieferkettenprozesse. Während eines Audits wird festgestellt, dass mehrere Cloud-Speicher unbeabsichtigt öffentlich erreichbar sind. Welche Risiken entstehen typischerweise durch Fehlkonfigurationen in Cloud- Umgebungen?",["Unkontrollierter Zugriff auf sensible Informationen", "Erhöhte Verfügbarkeit geschäftskritischer Systeme", "Verletzung von Vertraulichkeit und Datenschutzanforderungen", "Automatische Verbesserung der Netzwerksicherheit"],["A", "C"],"Ergänzungsfragen 3","Quelle: Quizfragenergänzung3, Frage 40. Im Übungsmodus muss die Auswahl exakt vollständig sein; es gibt keine Teilpunkte.")
+    ];
+    function q(n, question, texts, correct, topic, explanation) {
+      if (texts.length !== 4) throw new Error(`Frage ${n}: genau 4 Antwortmöglichkeiten erforderlich.`);
+      if (correct.length < 1) throw new Error(`Frage ${n}: mindestens 1 richtige Antwort erforderlich.`);
+      if (correct.length > 3) throw new Error(`Frage ${n}: maximal 3 richtige Antworten erlaubt.`);
+      if (correct.some((id) => !["A", "B", "C", "D"].includes(id))) throw new Error(`Frage ${n}: richtige Antworten dürfen nur A bis D sein.`);
+      return { id: `q${String(n).padStart(2,"0")}`, number: n, question, topic, explanation, type: "choice", options: texts.map((text, i) => ({ id: String.fromCharCode(65 + i), text, correct: correct.includes(String.fromCharCode(65 + i)) })) };
+    }
+    const STORE_KEY = "tuev_it_security_trainer_v1";
+    const APP_VERSION = "1.2.0";
+    const DEFAULTS = { count: 25, examMinutes: 30, secondsPerQuestion: 0, passPercent: 70, shuffleQuestions: true, shuffleAnswers: false, topic: "Alle", theme: "light" };
+    const PROFILES = { custom:null, short:{count:20, examMinutes:20, secondsPerQuestion:0, passPercent:70}, week:{count:40, examMinutes:45, secondsPerQuestion:0, passPercent:70}, full:{count:80, examMinutes:90, secondsPerQuestion:0, passPercent:70} };
+    const state = { view: "dashboard", settings: {...DEFAULTS}, history: [], customQuestions: [], notes: {}, importReports: [], practice: null, exam: null, repeatIds: [], timer: null };
+    const $ = (sel) => document.querySelector(sel);
+    const app = $("#app");
+    const title = $("#title");
+    load();
+    applyTheme();
+    render("dashboard");
+    document.querySelectorAll(".nav-item").forEach(btn => btn.addEventListener("click", () => render(btn.dataset.view)));
+    $("#menu").addEventListener("click", () => $("#sidebar").classList.toggle("open"));
+    $("#theme").addEventListener("click", () => { state.settings.theme = state.settings.theme === "dark" ? "light" : "dark"; save(); applyTheme(); });
+    document.addEventListener("keydown", handleKeys);
+    function load() {
+      try { Object.assign(state, JSON.parse(localStorage.getItem(STORE_KEY)) || {}); } catch {}
+      state.settings = {...DEFAULTS, ...(state.settings || {})};
+      state.repeatIds = state.repeatIds || [];
+      state.history = state.history || [];
+      state.customQuestions = state.customQuestions || [];
+      state.notes = state.notes || {};
+      state.importReports = state.importReports || [];
+    }
+    function save() {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ settings: state.settings, history: state.history, repeatIds: state.repeatIds, customQuestions: state.customQuestions, notes: state.notes, importReports: state.importReports }));
+    }
+    function applyTheme() { document.documentElement.dataset.theme = state.settings.theme; }
+    function render(view) {
+      clearInterval(state.timer);
+      state.view = view;
+      document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.view === view));
+      $("#sidebar").classList.remove("open");
+      const names = {dashboard:"Dashboard", practice:"Üben", exam:"Prüfung", questions:"Fragenbank", analysis:"Lernanalyse", settings:"Einstellungen"};
+      title.textContent = names[view];
+      ({dashboard, practice, exam, questions, analysis, settings}[view])();
+      app.focus({preventScroll:true});
+    }
+    function dashboard() {
+      const bank = questionBank();
+      const exams = state.history.filter(h => h.mode === "exam");
+      const practices = state.history.filter(h => h.mode === "practice");
+      const last = exams.at(-1);
+      const avg = exams.length ? Math.round(exams.reduce((s,h)=>s+h.percent,0)/exams.length) : 0;
+      const weak = weakTopics().slice(0,3);
+      app.innerHTML = `
+        <section class="grid cols-3">
+          ${metric("Fragen im Katalog", bank.length, `${DEFAULT_QUESTIONS.length} Original · ${state.customQuestions.length} eigene`)}
+          ${metric("Prüfungsschnitt", exams.length ? avg + "%" : "—", `${exams.length} Simulationen`)}
+          ${metric("Fehlerwiederholung", state.repeatIds.length, "gezielt fällige Fragen")}
+        </section>
+        <section class="card pad section"><h2>Fragenbestand</h2><p><strong>Version ${APP_VERSION}</strong> · ${bank.length} Fragen · ${topics().length} Themenbereiche</p></section>
+        <section class="grid cols-2 section">
+          <div class="card pad"><h2>Schnellstart</h2><p class="muted">Wähle Üben für sofortige Rückmeldung oder Prüfung für eine realistische Simulation ohne Hinweise.</p><div class="button-row"><button class="button" onclick="render('practice')">Üben starten</button><button class="button secondary" onclick="render('exam')">Prüfung starten</button><button class="button ghost" onclick="startRepeat()">Fehler wiederholen</button></div></div>
+          <div class="card pad"><h2>Letzte Prüfung</h2>${last ? resultMini(last) : `<p class="muted">Noch keine Prüfung absolviert.</p>`}</div>
+        </section>
+        <section class="card pad section"><h2>Lernfokus</h2>${weak.length ? weak.map(w => `<p><strong>${w.topic}</strong>: ${w.rate}% richtig aus ${w.total} beantworteten Fragen</p>`).join("") : `<p class="muted">Noch keine Schwächen erkennbar. Starte mit dem Übungsmodus.</p>`}</section>`;
+    }
+    function practice() {
+      app.innerHTML = settingsPanel("practice") + `<section id="run" class="section"></section>`;
+      bindProfile();
+      $("#start-practice").addEventListener("click", () => startPractice());
+    }
+    function exam() {
+      app.innerHTML = settingsPanel("exam") + `<section id="run" class="section"></section>`;
+      bindProfile();
+      $("#start-exam").addEventListener("click", () => startExam());
+    }
+    function settingsPanel(mode) {
+      const topicOptions = ["Alle", ...topics()].map(t => `<option value="${escapeHtml(t)}" ${state.settings.topic === t ? "selected" : ""}>${escapeHtml(t)}</option>`).join("");
+      return `<section class="card pad"><h2>${mode === "exam" ? "Prüfungssimulation konfigurieren" : "Übungsrunde konfigurieren"}</h2><div class="setting-grid section">
+        <label>Profil<select id="profile"><option value="custom">Benutzerdefiniert</option><option value="short">Kurztest · 20/20</option><option value="week">Wochenprüfung · 40/45</option><option value="full">Vollsimulation · 80/90</option></select></label>
+        <label>Thema<select id="topic">${topicOptions}</select></label>
+        <label>Fragenanzahl<input id="count" type="number" min="1" max="${questionBank().length}" value="${Math.min(state.settings.count, questionBank().length)}"></label>
+        <label>Gesamtzeit Minuten<input id="minutes" type="number" min="1" max="240" value="${state.settings.examMinutes}"></label>
+        <label>Zeit pro Frage Sekunden<input id="perq" type="number" min="0" max="900" value="${state.settings.secondsPerQuestion}"></label>
+        <label>Bestehensgrenze %<input id="pass" type="number" min="1" max="100" value="${state.settings.passPercent}"></label>
+      </div><div class="button-row section">
+        <label class="checkline"><input id="shuffle-q" type="checkbox" ${state.settings.shuffleQuestions ? "checked" : ""}> Fragen mischen</label>
+        <label class="checkline"><input id="shuffle-a" type="checkbox" ${state.settings.shuffleAnswers ? "checked" : ""}> Antworten mischen</label>
+        <button class="button" id="${mode === "exam" ? "start-exam" : "start-practice"}">${mode === "exam" ? "Prüfung starten" : "Üben starten"}</button>
+      </div></section>`;
+    }
+    function bindProfile() {
+      $("#profile")?.addEventListener("change", (event) => {
+        const p = PROFILES[event.target.value];
+        if (!p) return;
+        $("#count").value = Math.min(p.count, filteredBank().length || questionBank().length);
+        $("#minutes").value = p.examMinutes;
+        $("#perq").value = p.secondsPerQuestion;
+        $("#pass").value = p.passPercent;
+      });
+      $("#topic")?.addEventListener("change", (event) => {
+        state.settings.topic = event.target.value;
+        $("#count").max = filteredBank().length || questionBank().length;
+        $("#count").value = Math.min(+$("#count").value, +$("#count").max);
+      });
+    }
+    function readRunSettings() {
+      const profile = $("#profile")?.value || "custom";
+      if (PROFILES[profile]) Object.assign(state.settings, PROFILES[profile]);
+      Object.assign(state.settings, {
+        count: clamp(+$("#count").value, 1, questionBank().length),
+        examMinutes: clamp(+$("#minutes").value, 1, 240),
+        secondsPerQuestion: clamp(+$("#perq").value, 0, 900),
+        passPercent: clamp(+$("#pass").value, 1, 100),
+        topic: $("#topic")?.value || "Alle",
+        shuffleQuestions: $("#shuffle-q").checked,
+        shuffleAnswers: $("#shuffle-a").checked
+      });
+      save();
+      return state.settings;
+    }
+    function startPractice(ids) {
+      const s = readRunSettings();
+      const bank = filteredBank();
+      const base = ids?.length ? bank.filter(q => ids.includes(q.id)) : bank;
+      state.practice = { mode:"practice", questions: prepare(base, s).slice(0, ids?.length || s.count), index:0, answers:{}, started: Date.now(), feedback:null };
+      showPractice();
+    }
+    function showPractice() {
+      const p = state.practice, item = p.questions[p.index];
+      if (!item) return finishPractice();
+      $("#run").innerHTML = questionHtml(item, p.index, p.questions.length, false) + noteHtml(item) + `<div class="button-row section"><button class="button" onclick="submitPractice()">Auswerten</button>${p.feedback ? `<button class="button next" onclick="nextPractice()">Weiter</button>` : ""}</div>${p.feedback || ""}`;
+      restoreChecks(p.answers[item.id] || []);
+    }
+    function submitPractice() {
+      const p = state.practice, item = p.questions[p.index], chosen = selected();
+      p.answers[item.id] = chosen;
+      const r = evaluate(item, chosen);
+      if (!r.correct && !state.repeatIds.includes(item.id)) state.repeatIds.push(item.id);
+      p.feedback = feedbackHtml(item, r);
+      save();
+      showPractice();
+    }
+    function nextPractice() { state.practice.feedback = null; state.practice.index++; showPractice(); }
+    function finishPractice() {
+      const p = state.practice;
+      const details = p.questions.map(item => ({ questionId:item.id, chosen:p.answers[item.id] || [], correct:evaluate(item, p.answers[item.id] || []).correct }));
+      const correct = details.filter(d=>d.correct).length;
+      state.history.push({ id: crypto.randomUUID(), mode:"practice", date:new Date().toISOString(), total:p.questions.length, correct, percent:Math.round(correct/p.questions.length*100), durationSeconds: Math.round((Date.now()-p.started)/1000), details });
+      save();
+      $("#run").innerHTML = `<div class="card pad"><h2>Übungsrunde abgeschlossen</h2><p>${correct} von ${p.questions.length} Fragen korrekt (${Math.round(correct/p.questions.length*100)}%).</p><button class="button" onclick="render('practice')">Neue Runde</button></div>`;
+    }
+    function startExam() {
+      const s = readRunSettings();
+      const duration = s.secondsPerQuestion ? s.secondsPerQuestion * s.count : s.examMinutes * 60;
+      state.exam = { mode:"exam", questions: prepare(filteredBank(), s).slice(0, s.count), index:0, answers:{}, started:Date.now(), duration, passPercent:s.passPercent };
+      tickExam();
+      state.timer = setInterval(tickExam, 500);
+      showExam();
+    }
+    function tickExam() {
+      if (!state.exam) return;
+      const left = Math.max(0, state.exam.duration - Math.floor((Date.now() - state.exam.started) / 1000));
+      const el = $("#time-left");
+      if (el) el.textContent = fmt(left);
+      if (left <= 0) finishExam(true);
+    }
+    function showExam() {
+      const e = state.exam, item = e.questions[e.index];
+      $("#run").innerHTML = `<div class="card pad"><div class="button-row" style="justify-content:space-between"><span class="timer">Restzeit: <span id="time-left">${fmt(e.duration)}</span></span><button class="button danger" onclick="finishExam(false)">Prüfung abgeben</button></div></div>` + questionHtml(item, e.index, e.questions.length, false) + `<div class="button-row section"><button class="button secondary" onclick="prevExam()">Zurück</button><button class="button" onclick="nextExam()">Speichern & weiter</button></div>`;
+      restoreChecks(e.answers[item.id] || []);
+      tickExam();
+    }
+    function prevExam(){ storeExamAnswer(); state.exam.index = Math.max(0, state.exam.index - 1); showExam(); }
+    function nextExam(){ storeExamAnswer(); state.exam.index = Math.min(state.exam.questions.length - 1, state.exam.index + 1); showExam(); }
+    function storeExamAnswer(){ const item = state.exam.questions[state.exam.index]; state.exam.answers[item.id] = selected(); }
+    function finishExam(auto) {
+      if (!state.exam) return;
+      clearInterval(state.timer);
+      storeExamAnswer();
+      const e = state.exam;
+      const durationSeconds = Math.min(e.duration, Math.round((Date.now() - e.started) / 1000));
+      const details = e.questions.map(item => ({ questionId:item.id, chosen:e.answers[item.id] || [], correct:evaluate(item, e.answers[item.id] || []).correct }));
+      details.filter(d => !d.correct).forEach(d => { if (!state.repeatIds.includes(d.questionId)) state.repeatIds.push(d.questionId); });
+      const correct = details.filter(d=>d.correct).length;
+      const percent = Math.round(correct / e.questions.length * 100);
+      const result = { id: crypto.randomUUID(), mode:"exam", auto, date:new Date().toISOString(), total:e.questions.length, correct, percent, passPercent:e.passPercent, passed:percent >= e.passPercent, durationSeconds, details };
+      state.history.push(result);
+      state.exam = null;
+      save();
+      $("#run").innerHTML = examResult(result);
+    }
+    function questionHtml(item, index, total, reveal) {
+      return `<article class="card pad question-card"><div class="question-meta"><span class="pill">Frage ${index+1} von ${total}</span><span class="pill">Mehrfachauswahl möglich</span><span class="pill">${item.topic}</span></div><h2>${escapeHtml(item.question)}</h2><div class="answer-grid">${item.options.map(o => `<label class="option ${reveal && o.correct ? "correct" : ""}"><input name="answer" type="checkbox" value="${o.id}"><span><strong>${o.id})</strong> ${escapeHtml(o.text)}</span></label>`).join("")}</div></article>`;
+    }
+    function feedbackHtml(item, r) {
+      return `<div class="feedback ${r.correct ? "" : "error"}"><h3>${r.correct ? "Richtig" : "Falsch"}</h3><p><strong>Korrekt:</strong> ${correctIds(item).join(", ")} · <strong>Deine Antwort:</strong> ${r.chosen.length ? r.chosen.join(", ") : "keine"}</p><div class="answer-grid">${item.options.map(o => `<div class="option ${o.correct ? "correct" : (r.chosen.includes(o.id) ? "wrong" : "")}"><span><strong>${o.id})</strong> ${escapeHtml(o.text)}${o.correct ? " · korrekt" : ""}</span></div>`).join("")}</div><p>${escapeHtml(item.explanation)}</p></div>`;
+    }
+    function examResult(result) {
+      const wrongIds = result.details.filter(d => !d.correct).map(d => d.questionId);
+      return `<div class="card pad"><h2>${result.passed ? "Bestanden" : "Nicht bestanden"}</h2><p><strong>${result.percent}%</strong> · ${result.correct} von ${result.total} richtig · Bestehensgrenze ${result.passPercent}% · Zeitverbrauch ${fmt(result.durationSeconds)}${result.auto ? " · automatisch abgegeben" : ""}</p><div class="button-row"><button class="button" onclick='startReview(${JSON.stringify(wrongIds)})'>Review falscher Fragen</button><button class="button secondary" onclick="startRepeat()">Fehler wiederholen</button><button class="button secondary" onclick="render('exam')">Neue Prüfung</button></div></div><section class="list section">${result.details.map(d => detailHtml(d)).join("")}</section>`;
+    }
+    function detailHtml(d) {
+      const item = questionBank().find(q => q.id === d.questionId), c = correctIds(item), chosen = d.chosen || [];
+      return `<div class="list-item"><div class="button-row" style="justify-content:space-between"><strong>Frage ${item.number}: ${escapeHtml(item.question)}</strong><span class="pill ${d.correct ? "good" : "bad"}">${d.correct ? "richtig" : "falsch"}</span></div><p><strong>Gewählt:</strong> ${chosen.length ? chosen.join(", ") : "keine"} · <strong>Korrekt:</strong> ${c.join(", ")}</p><p class="muted">${escapeHtml(item.explanation)}</p></div>`;
+    }
+    function questions() {
+      app.innerHTML = `<section class="card pad"><h2>Fragenbank</h2><p class="muted">Enthält die gematchten Fragen aus den bereitgestellten Quizfragen- und Lösungs-PDFs plus optional eigene lokale Fragen. Alte data-Inhalte und KI-Beauftragten-Fragen sind nicht enthalten.</p><input id="search" placeholder="Fragen oder Themen suchen"></section>
+      <section class="card pad section"><h2>Fragenqualität</h2><div id="quality-report" class="list section">${qualityReport()}</div></section>
+      <section class="grid cols-2 section">
+        <div class="card pad">
+          <h2>Frage manuell hinzufügen</h2>
+          <div class="grid section">
+            <label>Frage<input id="manual-question" placeholder="Fragetext"></label>
+            <label>Thema<input id="manual-topic" placeholder="z. B. IAM"></label>
+            <label>Erklärung<input id="manual-explanation" placeholder="Kurze Begründung"></label>
+            <label>Antwort A<input id="manual-a"></label>
+            <label>Antwort B<input id="manual-b"></label>
+            <label>Antwort C<input id="manual-c"></label>
+            <label>Antwort D<input id="manual-d"></label>
+            <label>Korrekte Antworten<input id="manual-correct" placeholder="z. B. B oder A,C,D"></label>
+            <button class="button" id="add-manual">Frage speichern</button>
+          </div>
+        </div>
+        <div class="card pad">
+          <h2>Fragen per Datei importieren</h2>
+          <p class="muted">Unterstützt JSON, TXT, MD, MD5 und einfache textbasierte PDF-Dateien. Pro Frage sind genau 4 Antwortmöglichkeiten erforderlich; 1 bis 3 davon müssen korrekt sein. Scans ohne eingebetteten Text können lokal nicht gelesen werden.</p>
+          <input id="file-import" type="file" accept=".json,.txt,.md,.md5,.md.5,.pdf,application/json,text/plain,text/markdown,application/pdf">
+          <div class="feedback section">
+            <strong>Textformat</strong>
+            <p>Eine Frage pro Block: <code>Frage:</code>, danach <code>A)</code> bis <code>D)</code>, <code>Korrekt:</code> und optional <code>Erklärung:</code>.</p>
+          </div>
+          <div id="import-result" class="section muted"></div>
+        </div>
+      </section>
+      <section id="qlist" class="list section"></section>`;
+      $("#search").addEventListener("input", renderQuestions);
+      $("#add-manual").addEventListener("click", addManualQuestion);
+      $("#file-import").addEventListener("change", importFile);
+      renderQuestions();
+    }
+    function renderQuestions() {
+      const term = ($("#search")?.value || "").toLowerCase();
+      const rows = questionBank().filter(q => (q.question + q.topic).toLowerCase().includes(term));
+      $("#qlist").innerHTML = rows.map(item => `<div class="list-item"><div class="question-meta"><span class="pill">Frage ${item.number}</span><span class="pill">${item.topic}</span><span class="pill">Mehrfachauswahl möglich</span>${item.custom ? `<span class="pill warn">eigene Frage</span>` : `<span class="pill">Original</span>`}</div><h3>${escapeHtml(item.question)}</h3><div class="answer-grid">${item.options.map(o => `<div class="option"><span><strong>${o.id})</strong> ${escapeHtml(o.text)}</span></div>`).join("")}</div><p class="muted">Neutrale Fragenbank: Lösungen werden hier nicht markiert. Im Übungsmodus erscheinen sie nach der Auswertung.</p>${item.custom ? `<button class="button ghost" onclick="deleteCustomQuestion('${item.id}')">Eigene Frage löschen</button>` : ""}</div>`).join("");
+    }
+    function qualityReport() {
+      const seen = new Map(), notes = [];
+      questionBank().forEach(q => {
+        const key = q.question.toLowerCase().replace(/\s+/g, " ").trim();
+        if (seen.has(key)) notes.push(`Mögliches Duplikat: Frage ${seen.get(key)} und Frage ${q.number}`);
+        seen.set(key, q.number);
+        if (q.question.length > 360) notes.push(`Sehr langer Fragetext: Frage ${q.number}`);
+        if (q.options.some(o => o.text.length < 4)) notes.push(`Sehr kurze Antwortoption: Frage ${q.number}`);
+        if (q.options.length !== 4) notes.push(`Nicht genau 4 Antwortoptionen: Frage ${q.number}`);
+        const correct = q.options.filter(o => o.correct).length;
+        if (correct < 1 || correct > 3) notes.push(`Ungewöhnliches Lösungsmuster: Frage ${q.number}`);
+      });
+      return notes.length ? notes.slice(0, 20).map(n => `<div class="list-item"><span class="pill warn">Hinweis</span> ${escapeHtml(n)}</div>`).join("") : `<div class="list-item"><span class="pill good">OK</span> Keine auffälligen Strukturprobleme gefunden.</div>`;
+    }
+    function analysis() {
+      const exams = state.history.filter(h=>h.mode==="exam");
+      app.innerHTML = `<section class="grid cols-3">${metric("Gespeicherte Ergebnisse", state.history.length, "lokal im Browser")}${metric("Bestanden", exams.filter(e=>e.passed).length, "Prüfungssimulationen")}${metric("Fehlerfragen", state.repeatIds.length, "für Wiederholung")}</section><section class="card pad section"><h2>Themenanalyse</h2><div class="list section">${weakTopics(true).map(w=>`<div class="list-item"><strong>${w.topic}</strong><p>${w.correct}/${w.total} richtig · ${w.rate}%</p><div class="bar"><span style="width:${w.rate}%"></span></div></div>`).join("") || `<p class="muted">Noch keine Ergebnisse.</p>`}</div></section><section class="card pad section"><h2>Verlauf</h2><div class="list">${state.history.slice().reverse().map(h=>`<div class="list-item"><strong>${h.mode === "exam" ? "Prüfung" : "Übung"} · ${new Date(h.date).toLocaleString("de-DE")}</strong><p>${h.percent}% · ${h.correct}/${h.total} richtig · ${fmt(h.durationSeconds)}</p></div>`).join("") || `<p class="muted">Noch keine Ergebnisse.</p>`}</div><div class="button-row section"><button class="button danger" onclick="resetStats()">Lernstand zurücksetzen</button></div></section>`;
+    }
+    function settings() {
+      app.innerHTML = `<section class="card pad"><h2>Einstellungen</h2>${settingsPanel("exam")}<div class="button-row section"><button class="button" onclick="saveSettingsOnly()">Speichern</button><button class="button secondary" onclick="exportData()">Lernstand exportieren</button><button class="button secondary" onclick="document.getElementById('progress-import').click()">Lernstand importieren</button><input id="progress-import" type="file" accept=".json,application/json" class="hidden" onchange="importProgress(event)"></div></section><section class="card pad section"><h2>Importverlauf</h2><div class="list">${state.importReports.slice().reverse().map(r=>`<div class="list-item"><strong>${escapeHtml(r.file || "Import")}</strong><p>${new Date(r.date).toLocaleString("de-DE")} · ${r.accepted} übernommen · ${r.rejected} abgelehnt · ${r.total} erkannt</p></div>`).join("") || `<p class="muted">Noch keine Importe.</p>`}</div></section>`;
+    }
+    function saveSettingsOnly(){ readRunSettings(); render("dashboard"); }
+    function exportData(){
+      const blob = new Blob([JSON.stringify({ exportedAt:new Date().toISOString(), questions:questionBank(), history:state.history, repeatIds:state.repeatIds, settings:state.settings }, null, 2)], {type:"application/json"});
+      const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "tuev-it-sicherheit-lernstand.json"; a.click(); URL.revokeObjectURL(a.href);
+    }
+    async function importProgress(event){
+      const file = event.target.files[0]; if(!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        if (data.settings) state.settings = {...DEFAULTS, ...data.settings};
+        if (Array.isArray(data.history)) state.history = data.history;
+        if (Array.isArray(data.repeatIds)) state.repeatIds = data.repeatIds;
+        if (Array.isArray(data.questions)) {
+          const customs = data.questions.filter(q => q.custom);
+          if (customs.length) state.customQuestions = customs;
+        }
+        save(); applyTheme(); alert("Lernstand erfolgreich importiert."); render("dashboard");
+      } catch(e) { alert("Import fehlgeschlagen: " + e.message); }
+      event.target.value = "";
+    }
+    function resetStats(){ if(confirm("Lernstand und Ergebnisse wirklich löschen?")){ state.history=[]; state.repeatIds=[]; save(); render("analysis"); } }
+    function startRepeat(){ if(!state.repeatIds.length){ alert("Aktuell gibt es keine Fehlerfragen zur Wiederholung."); return; } render("practice"); setTimeout(()=>startPractice(state.repeatIds), 0); }
+    function startReview(ids){ if(!ids.length){ alert("Keine falschen Fragen in dieser Prüfung."); return; } render("practice"); setTimeout(()=>startPractice(ids), 0); }
+    function questionBank(){ return [...DEFAULT_QUESTIONS, ...state.customQuestions]; }
+    function topics(){ return [...new Set(questionBank().map(q => q.topic))].sort((a,b)=>a.localeCompare(b, "de")); }
+    function filteredBank(){ const t = state.settings.topic || "Alle"; return t === "Alle" ? questionBank() : questionBank().filter(q => q.topic === t); }
+    function noteHtml(item){ return `<section class="card pad section"><label>Meine Notiz zu dieser Frage<textarea onchange="saveNote('${item.id}', this.value)" placeholder="Eigene Eselsbrücke, Unsicherheit oder Merksatz">${escapeHtml(state.notes[item.id] || "")}</textarea></label></section>`; }
+    function saveNote(id, value){ state.notes[id] = value; save(); }
+    function handleKeys(event) {
+      if (["INPUT","TEXTAREA","SELECT"].includes(event.target.tagName)) return;
+      const key = event.key.toUpperCase();
+      if (["A","B","C","D"].includes(key)) {
+        const el = document.querySelector(`[name=answer][value="${key}"]`);
+        if (el) { el.checked = !el.checked; event.preventDefault(); }
+      }
+      if (event.key === "Enter") {
+        const next = document.querySelector(".button.next");
+        const answers = document.querySelector("[name=answer]");
+        if (next) next.click();
+        else if (answers && state.practice) submitPractice();
+      }
+    }
+    function addManualQuestion() {
+      const texts = ["a","b","c","d"].map(x => $(`#manual-${x}`).value.trim()).filter(Boolean);
+      const correct = $("#manual-correct").value.toUpperCase().split(/[\s,;]+/).filter(Boolean);
+      const item = normalizeQuestion({
+        question: $("#manual-question").value.trim(),
+        topic: $("#manual-topic").value.trim() || "Eigene Fragen",
+        explanation: $("#manual-explanation").value.trim() || "Eigene Frage ohne hinterlegte Erklärung.",
+        options: texts.map((text, i) => ({ id: String.fromCharCode(65 + i), text, correct: correct.includes(String.fromCharCode(65 + i)) }))
+      });
+      if (!item.valid) return alert(item.error);
+      state.customQuestions.push(item.question);
+      save();
+      ["question","topic","explanation","a","b","c","d","correct"].forEach(x => $(`#manual-${x}`).value = "");
+      renderQuestions();
+    }
+    async function importFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const lowerName = file.name.toLowerCase();
+      const ext = lowerName.endsWith(".md.5") ? "md5" : lowerName.split(".").pop();
+      const target = $("#import-result");
+      try {
+        let imported;
+        if (ext === "json") {
+          imported = parseJsonQuestions(await file.text());
+        } else if (ext === "pdf") {
+          imported = parseTextQuestions(extractPdfText(await file.arrayBuffer()));
+        } else if (["txt","md","md5"].includes(ext)) {
+          imported = parseTextQuestions(await file.text());
+        } else {
+          throw new Error("Dieses Format wird nicht unterstützt.");
+        }
+        if (!imported.length) throw new Error("Keine gültigen Fragen gefunden.");
+        state.customQuestions.push(...imported);
+        state.importReports.push({ date:new Date().toISOString(), file:file.name, ...(state._lastImportReport || { accepted:imported.length, rejected:0, total:imported.length }) });
+        state.importReports = state.importReports.slice(-10);
+        save();
+        const report = state._lastImportReport || { accepted: imported.length, rejected: 0, total: imported.length };
+        target.textContent = `${report.accepted} Frage(n) importiert, ${report.rejected} abgelehnt, ${report.total} erkannt.`;
+        renderQuestions();
+      } catch (error) {
+        target.textContent = `Import fehlgeschlagen: ${error.message}`;
+      } finally {
+        event.target.value = "";
+      }
+    }
+    function parseJsonQuestions(text) {
+      const raw = JSON.parse(text);
+      const list = Array.isArray(raw) ? raw : Array.isArray(raw.questions) ? raw.questions : [];
+      const mapped = list.map(normalizeQuestion);
+      state._lastImportReport = { total:list.length, accepted:mapped.filter(item => item.valid).length, rejected:mapped.filter(item => !item.valid).length };
+      return mapped.filter(item => item.valid).map(item => item.question);
+    }
+    function parseTextQuestions(text) {
+      const cleaned = text.replace(/\r/g, "").replace(/☐/g, "\n").replace(/([A-F]\))/g, "\n$1");
+      const blocks = cleaned.split(/\n\s*(?=(?:Frage|Question)\s*:|\d+[\.)]\s+)/i).map(x => x.trim()).filter(Boolean);
+      const parsed = [];
+      for (const block of blocks) {
+        const lines = block.split("\n").map(x => x.trim()).filter(Boolean);
+        const optionLines = lines.filter(line => /^[A-F][\).:-]\s+/i.test(line));
+        if (!optionLines.length) continue;
+        const firstOption = lines.findIndex(line => /^[A-F][\).:-]\s+/i.test(line));
+        const questionText = lines.slice(0, firstOption).join(" ").replace(/^(Frage|Question)\s*:\s*/i, "").replace(/^\d+[\.)]\s*/, "").trim();
+        const correctLine = lines.find(line => /^(Korrekt|Richtig|Correct|Antwort)\s*:/i.test(line)) || "";
+        const explanationLine = lines.find(line => /^(Erklärung|Begründung|Explanation)\s*:/i.test(line)) || "";
+        const correct = (correctLine.match(/[A-F]/gi) || []).map(x => x.toUpperCase());
+        const options = optionLines.map(line => {
+          const id = line[0].toUpperCase();
+          const marked = /^[A-F][\).:-]\s*(\*|\[x\]|x\s)/i.test(line);
+          return { id, text: line.replace(/^[A-F][\).:-]\s*(\*|\[x\]|x\s)?/i, "").trim(), correct: correct.includes(id) || marked };
+        });
+        const item = normalizeQuestion({ question: questionText, topic: "Import", explanation: explanationLine.replace(/^[^:]+:\s*/, "") || "Importierte Frage ohne hinterlegte Erklärung.", options });
+        if (item.valid) parsed.push(item.question);
+      }
+      state._lastImportReport = { total:blocks.length, accepted:parsed.length, rejected:Math.max(0, blocks.length - parsed.length) };
+      return parsed;
+    }
+    function extractPdfText(buffer) {
+      const bytes = new Uint8Array(buffer);
+      let binary = "";
+      for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+      const chunks = [];
+      binary.replace(/\(([^()]*)\)\s*Tj/g, (_, t) => chunks.push(t));
+      binary.replace(/\[((?:.|\n)*?)\]\s*TJ/g, (_, group) => group.replace(/\(([^()]*)\)/g, (__, t) => chunks.push(t)));
+      const text = chunks.join("\n").replace(/\\([()\\])/g, "$1").replace(/\\n/g, "\n");
+      if (!text.trim()) throw new Error("Aus dieser PDF konnte lokal kein Text extrahiert werden. Bitte als TXT, MD oder JSON exportieren.");
+      return text;
+    }
+    function normalizeQuestion(raw) {
+      const question = String(raw.question || raw.frage || "").trim();
+      const sourceOptions = raw.options || raw.antworten || [];
+      const options = sourceOptions.map((o, i) => ({
+        id: (o.id || String.fromCharCode(65 + i)).toUpperCase(),
+        text: String(o.text || o.answer || o.antwort || "").trim(),
+        correct: Boolean(o.correct ?? o.richtig)
+      })).filter(o => o.text);
+      const correctCount = options.filter(o => o.correct).length;
+      if (!question) return { valid:false, error:"Bitte einen Fragetext angeben." };
+      if (options.length !== 4) return { valid:false, error:"Eine Frage braucht genau 4 Antwortmöglichkeiten." };
+      if (correctCount < 1) return { valid:false, error:"Mindestens eine Antwort muss korrekt sein." };
+      if (correctCount > 3) return { valid:false, error:"Maximal 3 Antworten dürfen korrekt sein." };
+      const number = DEFAULT_QUESTIONS.length + state.customQuestions.length + 1;
+      return { valid:true, question: { id:`custom-${Date.now()}-${Math.random().toString(16).slice(2)}`, number, custom:true, question, topic: String(raw.topic || raw.thema || "Eigene Fragen").trim(), explanation: String(raw.explanation || raw.erklärung || raw.begruendung || "Eigene Frage ohne hinterlegte Erklärung.").trim(), type: "choice", options } };
+    }
+    function deleteCustomQuestion(id) {
+      if (!confirm("Eigene Frage wirklich löschen?")) return;
+      state.customQuestions = state.customQuestions.filter(q => q.id !== id);
+      state.repeatIds = state.repeatIds.filter(qid => qid !== id);
+      save();
+      renderQuestions();
+    }
+    function prepare(items, s) {
+      const qs = s.shuffleQuestions ? shuffle(items) : [...items];
+      return qs.map(item => ({...item, options: s.shuffleAnswers ? shuffle(item.options) : [...item.options]}));
+    }
+    function selected(){ return [...document.querySelectorAll("[name=answer]:checked")].map(i=>i.value).sort(); }
+    function restoreChecks(ids){ ids.forEach(id => { const el = document.querySelector(`[name=answer][value="${id}"]`); if(el) el.checked = true; }); }
+    function evaluate(item, chosen) { const a = correctIds(item).sort(); const b = [...chosen].sort(); return { correct: a.length === b.length && a.every((v,i)=>v===b[i]), chosen:b }; }
+    function correctIds(item){ return item.options.filter(o=>o.correct).map(o=>o.id).sort(); }
+    function weakTopics(all=false) {
+      const map = new Map();
+      state.history.flatMap(h=>h.details).forEach(d => { const q = questionBank().find(x=>x.id===d.questionId); if(!q) return; const m = map.get(q.topic) || {topic:q.topic,total:0,correct:0}; m.total++; if(d.correct)m.correct++; map.set(q.topic,m); });
+      return [...map.values()].map(x=>({...x, rate: x.total ? Math.round(x.correct/x.total*100) : 0})).filter(x=>all || x.rate < 80).sort((a,b)=>a.rate-b.rate || b.total-a.total);
+    }
+    function metric(label, value, sub){ return `<div class="card pad metric"><span class="muted">${label}</span><strong>${value}</strong><span class="muted">${sub}</span></div>`; }
+    function resultMini(r){ return `<p><strong>${r.percent}%</strong> · ${r.passed ? "bestanden" : "nicht bestanden"}</p><p class="muted">${r.correct}/${r.total} richtig, ${fmt(r.durationSeconds)} Zeitverbrauch</p>`; }
+    function fmt(seconds){ seconds = Math.max(0, seconds || 0); const m = Math.floor(seconds/60), s = seconds%60; return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+    function shuffle(arr){ return [...arr].map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]); }
+    function clamp(n,min,max){ return Math.max(min, Math.min(max, Number.isFinite(n) ? n : min)); }
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch])); }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(console.error));
+    }
+  </script>
+</body>
+</html>
